@@ -1,0 +1,23 @@
+=== Evaluation Results ===
+Date: Wed Jan 28 13:41:27 CET 2026
+Arguments: C:\Users\eneko\Downloads\adult.train.arff, output.txt
+
+NB 5-fCV nahasmen matrizea:
+=== Confusion Matrix ===
+
+     a     b   <-- classified as
+ 23083  1637 |     a =  <=50K
+  3747  4094 |     b =  >50K
+
+Correctly Classified Instances   83,4649 %
+Incorrectly Classified Instances 16,5351 %
+Kappa statistic                  0,5020
+Mean absolute error              0,1732
+Root mean squared error          0,3717
+Relative absolute error          47,3570 %
+Root relative squared error      86,9215 %
+
+=== Detailed Accuracy By Class (Precision) ===
+Class  <=50K          Precision: 0,8603
+Class  >50K           Precision: 0,7144
+Weighted Avg. Precision:        0,8252

@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact name="EHES:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/EHES_jar</output-path>
+    <root id="root">
+      <element id="archive" name="EHES.jar">
+        <element id="module-output" name="EHES" />
+      </element>
+      <element id="library" level="project" name="weka" />
+    </root>
+  </artifact>
+</component>
