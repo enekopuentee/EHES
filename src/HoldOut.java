@@ -27,7 +27,6 @@ public class HoldOut {
             if (data.classIndex() == -1) {
                 data.setClassIndex(data.numAttributes() - 1);
             }
-
             // DATUEN BANAKETA (Hold-out %66)
             Randomize randomize = new Randomize();
             randomize.setInputFormat(data);
