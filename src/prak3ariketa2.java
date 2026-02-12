@@ -24,6 +24,7 @@ public class prak3ariketa2 {
         System.out.println("-----------------------");
 		
 		for (int i=0; i < data.numInstances(); i++) {
+			double benetakoa = data.instance(i).classValue();
 			double iragarpena = nbM.classifyInstance(data.instance(i));
 			String labelName = data.classAttribute().value((int) iragarpena);
             String line = ((i + 1) + "  |  " + labelName);
