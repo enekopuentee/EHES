@@ -1,6 +1,7 @@
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
+import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
@@ -9,7 +10,7 @@ import weka.core.converters.ConverterUtils.DataSource;
 public class prak3ariketa2 {
 	public static void main(String[] args) throws Exception {
 		
-		NaiveBayes nbM = (NaiveBayes) SerializationHelper.read(args[0]);
+		Classifier nbM = (Classifier) SerializationHelper.read(args[0]);
 		
 		DataSource source = new DataSource(args[1]);
 		Instances data = source.getDataSet();
