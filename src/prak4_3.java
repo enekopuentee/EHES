@@ -29,69 +29,40 @@ public class prak4_3 {
             }
         }
 
-        // 3. STRATIFIED HOLD-OUT (%80 train / %20 test)
-        Resample rs = new Resample();
-        rs.setNoReplacement(true);
-        rs.setSampleSizePercent(80);
-        rs.setRandomSeed(42);
-        rs.setInputFormat(data);
-        Instances train = Filter.useFilter(data, rs);
-        
-        rs.setSampleSizePercent(20);
-        rs.setInputFormat(data);
-        Instances test = Filter.useFilter(data, rs);
+        // 2. Meta-sailkatzailea sortu (CVParameterSelection)
+        CVParameterSelection cvp = new CVParameterSelection();
+        cvp.setClassifier(new RandomForest()); // RandomForest oinarri gisa
+        cvp.setNumFolds(5);                    // 5-fold cross validation 
 
-        // 4. PARAMETRO EKORKETA (maxDepth eta numFeatures)
-        int bestMaxDepth = -1;
-        int bestNumFeatures = -1;
-        double bestFScore = -1;
+        // 3. PARAMETROAK DEFINITU
+        // maxDepth (sakonera): 0-tik (mugagabea) 20-ra probatu
+        cvp.addCVParameter("maxDepth 0 20 5"); 
+        // numFeatures (atributuak): 1-etik 5-era probatu
+        cvp.addCVParameter("numFeatures 1 5 5"); 
 
-        int[] depthRange = {0, 5, 10, 15}; // 0 = mugagabea
-        int[] featureRange = {1, 2, 3, 4}; // Atributu kopuruaren arabera
-
-        System.out.println("Ekorketa hasten...");
-
-        for (int depth : depthRange) {
-            for (int features : featureRange) {
-                RandomForest rf = new RandomForest();
-                rf.setMaxDepth(depth);
-                rf.setNumFeatures(features);
-
-                rf.buildClassifier(train);
-                Evaluation eval = new Evaluation(train);
-                eval.evaluateModel(rf, test);
-
-                // KLASE MINORITARIOAREN F-SCORE-A
-                double fScore = eval.fMeasure(minorityClassIdx);
-
-                if (fScore > bestFScore) {
-                    bestFScore = fScore;
-                    bestMaxDepth = depth;
-                    bestNumFeatures = features;
-                }
-            }
-        }
+        // 4. EKORKETA EXEKUTATU
+        System.out.println("Ekorketa prozesua hasten (honek luzeago jo dezake)...");
+        cvp.buildClassifier(data);
 
         // 5. EMAITZA OPTIMOAK INPRIMATU
-        System.out.println("--- PARAMETRO OPTIMOAK ---");
-        System.out.println("MaxDepth: " + bestMaxDepth);
-        System.out.println("NumFeatures: " + bestNumFeatures);
-        System.out.println("Minority Class F-Score: " + bestFScore);
+        String bestOptions = Utils.joinOptions(cvp.getBestClassifierOptions());
+        System.out.println("-------------------------------------------------");
+        System.out.println("Parametro optimoak aurkituta: " + bestOptions);
+        System.out.println("-------------------------------------------------");
 
-        // 6. EREDU OPTIMOA GORDE
-        RandomForest bestRF = new RandomForest();
-        bestRF.setMaxDepth(bestMaxDepth);
-        bestRF.setNumFeatures(bestNumFeatures);
-        bestRF.buildClassifier(train);
-        SerializationHelper.write("rf_optimoa.model", bestRF);
+        // 6. EREDU IRAGARLE OPTIMOA GORDE
+        SerializationHelper.write("RF_optimoa.model", cvp);
+        System.out.println("Eredua 'RF_optimoa.model' fitxategian gorde da.");
 
         // 7. EREDUA KARGATU ETA IRAGARPENAK EGIN (3. Praktikako logika)
-        RandomForest loadedRF = (RandomForest) SerializationHelper.read("rf_optimoa.model");
-        System.out.println("\n--- TEST MULTZOKO IRAGARPENAK ---");
-        for (int i = 0; i < test.numInstances(); i++) {
-            double pred = loadedRF.classifyInstance(test.instance(i));
-            System.out.println("Instantzia " + i + " | Benetakoa: " + test.classAttribute().value((int)test.instance(i).classValue()) + 
-                               " | Iragarpena: " + test.classAttribute().value((int)pred));
+        CVParameterSelection loadedCvp = (CVParameterSelection) SerializationHelper.read("RF_optimoa.model");
+        
+        System.out.println("\nIragarpenak (lehenengo 5 instantziak):");
+        for (int i = 0; i < 5 && i < data.numInstances(); i++) {
+            double pred = loadedCvp.classifyInstance(data.instance(i));
+            String real = data.classAttribute().value((int) data.instance(i).classValue());
+            String predicted = data.classAttribute().value((int) pred);
+            System.out.println("Instantzia " + i + " | Benetakoa: " + real + " | Iragarpena: " + predicted);
         }
     }
 }
